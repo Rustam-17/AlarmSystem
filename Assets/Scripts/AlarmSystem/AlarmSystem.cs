@@ -7,23 +7,22 @@ public class AlarmSystem : MonoBehaviour
 {
     [SerializeField] private UnityEvent _someoneCameIn;
     [SerializeField] private UnityEvent _enteredCameOut;
-    //[SerializeField] private AudioSource _audioSourceWorkingIndicator;
-    [SerializeField] private AudioSource _audioSourceAlarmSignal;
+    [SerializeField] private AudioSource _audioSourceWorkingIndicator;
     [SerializeField] private bool _isWorking;
 
     private Collider2D _enteredCollider;
 
     private void Update()
     {
-        //if (_isWorking && _audioSourceAlarmSignal.isPlaying == false)
-        //{
-        //    _audioSourceAlarmSignal.Play();
-        //}
+        if (_isWorking && _audioSourceWorkingIndicator.isPlaying == false)
+        {
+            _audioSourceWorkingIndicator.Play();
+        }
 
-        //if (_isWorking == false && _audioSourceAlarmSignal.isPlaying)
-        //{
-        //    _audioSourceAlarmSignal.Stop();
-        //}
+        if (_isWorking == false && _audioSourceWorkingIndicator.isPlaying)
+        {
+            _audioSourceWorkingIndicator.Stop();
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -44,11 +43,5 @@ public class AlarmSystem : MonoBehaviour
                 _enteredCameOut?.Invoke();
             }
         }
-    }
-
-    public void StopAlarmSignal()
-    {
-        Debug.Log("soundOff");
-        _audioSourceAlarmSignal.Stop();
     }
 }
