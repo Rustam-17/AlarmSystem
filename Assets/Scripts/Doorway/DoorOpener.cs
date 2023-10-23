@@ -4,55 +4,74 @@ using UnityEngine;
 
 public class DoorOpener : MonoBehaviour
 {
-    [SerializeField] private float _openTime;
-    [SerializeField] private bool _mustOpened;
-    [SerializeField] private bool _mustClosed;
+    [SerializeField] private GameObject _hinge;
+    [SerializeField] private GameObject _barrier;
+    [SerializeField] private float _openingTime;
+    [SerializeField] private bool _mustMoved;
+    [SerializeField] private bool _isOpening;
 
+    private Transform _hingeTransform;
     private Quaternion _closeRotation;
     private Quaternion _openedRotation;
-    private float _openRatioStep;
-    private float _openRatio;
-    private bool _isOpened;
-
-    private void OnValidate()
-    {
-        _mustOpened = !_mustClosed;
-    }
+    private Quaternion _currentRotation;
+    private Quaternion _targetRotation;
+    private float _semiOpenedRatio;
+    private float _ratioStep;
+    private float _ratio;
 
     private void Start()
     {
+        _hingeTransform = _hinge.GetComponent<Transform>();
+
         _closeRotation = Quaternion.Euler(0, 90, 0);
         _openedRotation = Quaternion.Euler(0, -30, 0);
-
-        _openRatioStep = 1 / (_openTime / Time.deltaTime);
-        _openRatio = 0;
-
-        Debug.Log(_openRatioStep);
+        _currentRotation = _hingeTransform.rotation;
+        _semiOpenedRatio = 0.5f;
+        
+        _ratioStep = 1 / (_openingTime / Time.deltaTime);
+        _ratio = 0;
     }
 
     private void Update()
     {
-        if (_mustOpened && _isOpened == false)
+        if (_mustMoved)
         {
-            transform.rotation = Quaternion.Slerp(_closeRotation, _openedRotation, _openRatio);
-            _openRatio += _openRatioStep;
-
-            if (transform.rotation == _openedRotation)
+            if (_isOpening)
             {
-                _isOpened = true;
+                _targetRotation = _openedRotation;
+            }
+            else
+            {
+                _targetRotation = _closeRotation;
             }
 
-            Debug.Log(_openRatioStep);
+            MoveDoor();
+        }        
+    }
+
+    private void MoveDoor()
+    {
+        _hingeTransform.rotation = Quaternion.Slerp(_currentRotation, _targetRotation, _ratio);
+        _ratio += _ratioStep;
+
+        if (_ratio > _semiOpenedRatio)
+        {
+            _barrier.GetComponent<BoxCollider2D>().enabled = false;
+        }
+
+        if (_hingeTransform.rotation == _targetRotation)
+        {
+            _mustMoved = false;
+            _ratio = 0;
         }
     }
 
-    public void InitiateOpen()
+    public void InitiateMoving()
     {
-        _mustOpened = true;
-    }
+        _mustMoved = true;
+        _isOpening =! _isOpening;
 
-    public void InitiateClose()
-    {
-        _mustOpened = true;
+        _currentRotation = _hingeTransform.rotation;
+        _ratio = 0;
     }
 }

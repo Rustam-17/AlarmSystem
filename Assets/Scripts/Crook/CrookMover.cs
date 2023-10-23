@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class CrookMover : MonoBehaviour
 {
-    [SerializeField] private float _speed;
+    [SerializeField] private Rigidbody2D _rigidbody2D;
+    [SerializeField] private float _force;
+    [SerializeField] private float _maxSpeed;
+    [SerializeField] private float _brackingForce;
 
     private Vector2 _leftDirection;
     private Vector2 _rightDirection;
+    private float _currentSpeed;
 
     private void Start()
     {
@@ -17,14 +21,24 @@ public class CrookMover : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            transform.Translate(_speed * Time.deltaTime * _leftDirection);
-        }
+        _currentSpeed = Mathf.Abs(_rigidbody2D.velocity.x);
 
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (_currentSpeed < _maxSpeed)
         {
-            transform.Translate(_speed * Time.deltaTime * _rightDirection);
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                _rigidbody2D.AddForce(_leftDirection * _force);
+            }
+            else if (Input.GetKey(KeyCode.RightArrow))
+            {
+                _rigidbody2D.AddForce(_rightDirection * _force);
+            }
+            else if (_currentSpeed > 0)
+            {                
+                Vector2 currenMotion = _rigidbody2D.velocity;
+                currenMotion.Normalize();
+                _rigidbody2D.AddForce( currenMotion * -_brackingForce);
+            }
         }
     }
 }
