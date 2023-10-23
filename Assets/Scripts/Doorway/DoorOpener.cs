@@ -27,7 +27,7 @@ public class DoorOpener : MonoBehaviour
         _openedRotation = Quaternion.Euler(0, -30, 0);
         _currentRotation = _hingeTransform.rotation;
         _semiOpenedRatio = 0.5f;
-        
+
         _ratioStep = 1 / (_openingTime / Time.deltaTime);
         _ratio = 0;
     }
@@ -36,21 +36,21 @@ public class DoorOpener : MonoBehaviour
     {
         if (_mustMoved)
         {
-            if (_isOpening)
-            {
-                _targetRotation = _openedRotation;
-            }
-            else
-            {
-                _targetRotation = _closeRotation;
-            }
-
             MoveDoor();
-        }        
+        }
     }
 
     private void MoveDoor()
     {
+        if (_isOpening)
+        {
+            _targetRotation = _openedRotation;
+        }
+        else
+        {
+            _targetRotation = _closeRotation;
+        }
+
         _hingeTransform.rotation = Quaternion.Slerp(_currentRotation, _targetRotation, _ratio);
         _ratio += _ratioStep;
 
@@ -69,7 +69,7 @@ public class DoorOpener : MonoBehaviour
     public void InitiateMoving()
     {
         _mustMoved = true;
-        _isOpening =! _isOpening;
+        _isOpening = !_isOpening;
 
         _currentRotation = _hingeTransform.rotation;
         _ratio = 0;
